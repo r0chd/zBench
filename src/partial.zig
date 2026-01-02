@@ -14,7 +14,7 @@ pub fn Partial(comptime T: type) type {
     }
     var result = T_info;
     result.fields = &fields;
-    return @Type(.{ .@"struct" = result });
+    return @TypeOf(.{ .@"struct" = result });
 }
 
 /// Take any non-null fields from x, and any null fields are taken from y

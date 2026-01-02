@@ -36,35 +36,35 @@ pub const OsInfo = struct {
 
 const platform = @tagName(builtin.os.tag) ++ " " ++ @tagName(builtin.cpu.arch);
 
-pub fn getSystemInfo() !OsInfo {
+pub fn getSystemInfo(io: std.Io) !OsInfo {
     if (osinfo) |x| return x;
     osinfo = OsInfo{
         .platform = platform,
-        .cpu = try getCpuName(),
-        .cpu_cores = try getCpuCores(),
-        .memory_total = try getTotalMemory(),
+        .cpu = try getCpuName(io),
+        .cpu_cores = try getCpuCores(io),
+        .memory_total = try getTotalMemory(io),
     };
     return osinfo.?;
 }
 
-fn getCpuName() ![]const u8 {
+fn getCpuName(io: std.Io) ![]const u8 {
     switch (builtin.os.tag) {
         .linux => {
-            const cpu_array = try lnx.getCpuName();
+            const cpu_array = try lnx.getCpuName(io);
             const len = std.mem.indexOfScalar(u8, &cpu_array, 0) orelse cpu_array.len;
             const copy_len = @min(cpu_name_buffer.len, len);
             @memcpy(cpu_name_buffer[0..copy_len], cpu_array[0..copy_len]);
             return cpu_name_buffer[0..copy_len];
         },
         .macos => {
-            const cpu_array = try mac.getCpuName();
+            const cpu_array = try mac.getCpuName(io);
             const len = std.mem.indexOfScalar(u8, &cpu_array, 0) orelse cpu_array.len;
             const copy_len = @min(cpu_name_buffer.len, len);
             @memcpy(cpu_name_buffer[0..copy_len], cpu_array[0..copy_len]);
             return cpu_name_buffer[0..copy_len];
         },
         .windows => {
-            const cpu_array = try win.getCpuName();
+            const cpu_array = try win.getCpuName(io);
             const len = std.mem.indexOfScalar(u8, &cpu_array, 0) orelse cpu_array.len;
             const copy_len = @min(cpu_name_buffer.len, len);
             @memcpy(cpu_name_buffer[0..copy_len], cpu_array[0..copy_len]);
@@ -74,27 +74,27 @@ fn getCpuName() ![]const u8 {
     }
 }
 
-fn getCpuCores() !u32 {
+fn getCpuCores(io: std.Io) !u32 {
     return switch (builtin.os.tag) {
-        .linux => try lnx.getCpuCores(),
-        .macos => try mac.getCpuCores(),
-        .windows => try win.getCpuCores(),
+        .linux => try lnx.getCpuCores(io),
+        .macos => try mac.getCpuCores(io),
+        .windows => try win.getCpuCores(io),
         else => error.UnsupportedOs,
     };
 }
 
-fn getTotalMemory() !u64 {
+fn getTotalMemory(io: std.Io) !u64 {
     return switch (builtin.os.tag) {
-        .linux => try lnx.getTotalMemory(),
-        .macos => try mac.getTotalMemory(),
-        .windows => try win.getTotalMemory(),
+        .linux => try lnx.getTotalMemory(io),
+        .macos => try mac.getTotalMemory(io),
+        .windows => try win.getTotalMemory(io),
         else => error.UnsupportedOs,
     };
 }
 
 test OsInfo {
     // No allocator and no free needed, it's stored statically.
-    const sysinfo = try getSystemInfo();
+    const sysinfo = try getSystemInfo(std.testing.io);
     try std.testing.expect(sysinfo.platform.len != 0);
     try std.testing.expect(sysinfo.cpu.len != 0);
     try std.testing.expect(0 < sysinfo.cpu_cores);
