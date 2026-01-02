@@ -20,7 +20,10 @@ fn myBenchmark(_: std.mem.Allocator) void {
 }
 
 pub fn main() !void {
-    var stdout = std.fs.File.stdout().writerStreaming(&.{});
+    var threaded: std.Io.Threaded = .init_single_threaded;
+    const io = threaded.io();
+
+    var stdout: std.Io.File.Writer = std.Io.File.stdout().writerStreaming(io, &.{});
     const writer = &stdout.interface;
 
     var bench = zbench.Benchmark.init(std.heap.page_allocator, .{});
