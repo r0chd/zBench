@@ -57,14 +57,14 @@ fn getCpuName(io: std.Io) ![]const u8 {
             return cpu_name_buffer[0..copy_len];
         },
         .macos => {
-            const cpu_array = try mac.getCpuName(io);
+            const cpu_array = try mac.getCpuName();
             const len = std.mem.indexOfScalar(u8, &cpu_array, 0) orelse cpu_array.len;
             const copy_len = @min(cpu_name_buffer.len, len);
             @memcpy(cpu_name_buffer[0..copy_len], cpu_array[0..copy_len]);
             return cpu_name_buffer[0..copy_len];
         },
         .windows => {
-            const cpu_array = try win.getCpuName(io);
+            const cpu_array = try win.getCpuName();
             const len = std.mem.indexOfScalar(u8, &cpu_array, 0) orelse cpu_array.len;
             const copy_len = @min(cpu_name_buffer.len, len);
             @memcpy(cpu_name_buffer[0..copy_len], cpu_array[0..copy_len]);
@@ -77,8 +77,8 @@ fn getCpuName(io: std.Io) ![]const u8 {
 fn getCpuCores(io: std.Io) !u32 {
     return switch (builtin.os.tag) {
         .linux => try lnx.getCpuCores(io),
-        .macos => try mac.getCpuCores(io),
-        .windows => try win.getCpuCores(io),
+        .macos => try mac.getCpuCores(),
+        .windows => try win.getCpuCores(),
         else => error.UnsupportedOs,
     };
 }
@@ -86,8 +86,8 @@ fn getCpuCores(io: std.Io) !u32 {
 fn getTotalMemory(io: std.Io) !u64 {
     return switch (builtin.os.tag) {
         .linux => try lnx.getTotalMemory(io),
-        .macos => try mac.getTotalMemory(io),
-        .windows => try win.getTotalMemory(io),
+        .macos => try mac.getTotalMemory(),
+        .windows => try win.getTotalMemory(),
         else => error.UnsupportedOs,
     };
 }
