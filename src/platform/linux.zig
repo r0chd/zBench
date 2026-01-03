@@ -1,6 +1,5 @@
 const std = @import("std");
 const mem = std.mem;
-const Io = std.Io;
 const log = std.log.scoped(.zbench_platform_linux);
 
 pub fn getCpuName(io: std.Io) ![128:0]u8 {

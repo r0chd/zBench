@@ -2,7 +2,7 @@ const std = @import("std");
 const Statistics = @import("statistics.zig").Statistics;
 const fmt = @import("fmt.zig");
 const statistics = @import("statistics.zig");
-const Color = std.Io.tty.Color;
+const Color = std.Io.Terminal.Color;
 const Runner = @import("runner.zig");
 const Readings = Runner.Readings;
 
