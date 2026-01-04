@@ -220,8 +220,8 @@ pub fn prettyPrintHeader(writer: *std.Io.Writer) !void {
 }
 
 /// Get a copy of the system information, cpu type, cores, memory, etc.
-pub fn getSystemInfo(io: std.Io) !platform.OsInfo {
-    return try platform.getSystemInfo(io);
+pub fn getSystemInfo() !platform.OsInfo {
+    return try platform.getSystemInfo();
 }
 
 test {

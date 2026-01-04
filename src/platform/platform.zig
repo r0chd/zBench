@@ -36,8 +36,10 @@ pub const OsInfo = struct {
 
 const platform = @tagName(builtin.os.tag) ++ " " ++ @tagName(builtin.cpu.arch);
 
-pub fn getSystemInfo(io: std.Io) !OsInfo {
+pub fn getSystemInfo() !OsInfo {
     if (osinfo) |x| return x;
+    var threaded: std.Io.Threaded = .init_single_threaded;
+    const io = threaded.io();
     osinfo = OsInfo{
         .platform = platform,
         .cpu = try getCpuName(io),
@@ -94,7 +96,7 @@ fn getTotalMemory(io: std.Io) !u64 {
 
 test OsInfo {
     // No allocator and no free needed, it's stored statically.
-    const sysinfo = try getSystemInfo(std.testing.io);
+    const sysinfo = try getSystemInfo();
     try std.testing.expect(sysinfo.platform.len != 0);
     try std.testing.expect(sysinfo.cpu.len != 0);
     try std.testing.expect(0 < sysinfo.cpu_cores);

@@ -7,5 +7,6 @@ pub fn main() !void {
 
     var stdout: std.Io.File.Writer = std.Io.File.stdout().writerStreaming(io, &.{});
     const writer = &stdout.interface;
-    try writer.print("\n\n{f}\n", .{try zbench.getSystemInfo(io)});
+
+    try writer.print("\n\n{f}\n", .{try zbench.getSystemInfo()});
 }
