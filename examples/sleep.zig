@@ -1,14 +1,14 @@
 const std = @import("std");
 const zbench = @import("zbench");
 
+var threaded: std.Io.Threaded = .init_single_threaded;
+const io = threaded.io();
+
 fn sleepBenchmark(_: std.mem.Allocator) void {
-    std.Thread.sleep(100_000_000);
+    io.sleep(.fromMilliseconds(100), .awake) catch {};
 }
 
 pub fn main() !void {
-    var threaded: std.Io.Threaded = .init_single_threaded;
-    const io = threaded.io();
-
     var stdout: std.Io.File.Writer = std.Io.File.stdout().writerStreaming(io, &.{});
     const writer = &stdout.interface;
 
