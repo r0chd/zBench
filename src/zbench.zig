@@ -72,8 +72,8 @@ pub const Benchmark = struct {
             ),
         };
 
-        // Check the benchmark parameter has a well typed run function.
-        _ = @as(fn (T, std.mem.Allocator) void, T.run);
+        // Check the benchmark parameter has a well-typed run function.
+        _ = @as(fn (*T, std.mem.Allocator) void, T.run);
 
         try self.benchmarks.append(self.allocator, Definition{
             .name = name,
