@@ -44,7 +44,7 @@ pub fn main() !void {
             defer x.deinit();
             defer i += 1;
             if (0 < i) try writer.writeAll(", ");
-            try x.writeJSON(gpa.allocator(), writer);
+            try x.writeJSON(writer);
         },
     };
     try writer.writeAll("]\n");

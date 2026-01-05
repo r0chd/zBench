@@ -21,7 +21,11 @@ pub fn Statistics(comptime T: type) type {
         };
 
         /// Create a statistical summary of a dataset.
-        pub fn init(allocator: std.mem.Allocator, readings: []const T) !Self {
+        ///
+        /// Sortes "readings" slice in ascending order to get min and max.
+        /// Note: since this is a pointer type, this modification affects
+        /// the slice at the call site.
+        pub fn init(readings: []T) !Self {
             const len = readings.len;
 
             // Calculate total and mean
@@ -39,20 +43,18 @@ pub fn Statistics(comptime T: type) type {
                 break :blk if (1 < len) std.math.sqrt(nvar / (len - 1)) else 0;
             };
 
-            const sorted = try allocator.dupe(T, readings);
-            defer allocator.free(sorted);
-            std.sort.heap(T, sorted, {}, std.sort.asc(T));
+            std.sort.heap(T, readings, {}, std.sort.asc(T));
 
             return Self{
                 .total = total,
                 .mean = mean,
                 .stddev = stddev,
-                .min = if (len == 0) 0 else sorted[0],
-                .max = if (len == 0) 0 else sorted[len - 1],
+                .min = if (len == 0) 0 else readings[0],
+                .max = if (len == 0) 0 else readings[len - 1],
                 .percentiles = Percentiles{
-                    .p75 = if (len == 0) 0 else sorted[len * 75 / 100],
-                    .p99 = if (len == 0) 0 else sorted[len * 99 / 100],
-                    .p995 = if (len == 0) 0 else sorted[len * 995 / 1000],
+                    .p75 = if (len == 0) 0 else readings[len * 75 / 100],
+                    .p99 = if (len == 0) 0 else readings[len * 99 / 100],
+                    .p995 = if (len == 0) 0 else readings[len * 995 / 1000],
                 },
             };
         }
@@ -110,7 +112,7 @@ test Statistics {
                 .p99 = 0,
                 .p995 = 0,
             },
-        }, try Statistics(u64).init(std.testing.allocator, timings_ns.items));
+        }, try Statistics(u64).init(timings_ns.items));
     }
 
     {
@@ -128,7 +130,7 @@ test Statistics {
                 .p99 = 1,
                 .p995 = 1,
             },
-        }, try Statistics(u64).init(std.testing.allocator, timings_ns.items));
+        }, try Statistics(u64).init(timings_ns.items));
     }
 
     {
@@ -147,7 +149,7 @@ test Statistics {
                 .p99 = 15,
                 .p995 = 15,
             },
-        }, try Statistics(u64).init(std.testing.allocator, timings_ns.items));
+        }, try Statistics(u64).init(timings_ns.items));
     }
 
     {
@@ -166,7 +168,7 @@ test Statistics {
                 .p99 = 99,
                 .p995 = 100,
             },
-        }, try Statistics(u64).init(std.testing.allocator, timings_ns.items));
+        }, try Statistics(u64).init(timings_ns.items));
     }
 
     {
@@ -186,6 +188,28 @@ test Statistics {
                 .p99 = 99,
                 .p995 = 100,
             },
-        }, try Statistics(u64).init(std.testing.allocator, timings_ns.items));
+        }, try Statistics(u64).init(timings_ns.items));
+    }
+
+    {
+        var timings_ns = std.array_list.Managed(u64).init(std.testing.allocator);
+        defer timings_ns.deinit();
+        try timings_ns.append(1);
+        for (1..101) |i| try timings_ns.append(i);
+        var prng = std.Random.DefaultPrng.init(0);
+        const random = prng.random();
+        random.shuffle(u64, timings_ns.items);
+        try expectEqDeep(Statistics(u64){
+            .total = 5051,
+            .mean = 50,
+            .stddev = 29,
+            .min = 1,
+            .max = 100,
+            .percentiles = .{
+                .p75 = 75,
+                .p99 = 99,
+                .p995 = 100,
+            },
+        }, try Statistics(u64).init(timings_ns.items));
     }
 }

@@ -2,7 +2,8 @@ const std = @import("std");
 const Statistics = @import("statistics.zig").Statistics;
 const fmt = @import("fmt.zig");
 const statistics = @import("statistics.zig");
-const Color = std.Io.Terminal.Color;
+// TODO :
+// const Color = std.Io.Terminal.Color;
 const Runner = @import("runner.zig");
 const Readings = Runner.Readings;
 
@@ -26,24 +27,26 @@ pub const Result = struct {
     /// tty_config: TTY configuration for color output.
     pub fn prettyPrint(
         self: Result,
-        allocator: std.mem.Allocator,
         writer: *std.Io.Writer,
-        tty_config: std.Io.tty.Config,
+        // TODO :
+        // tty_config: std.Io.tty.Config,
     ) !void {
         var buf: [128]u8 = undefined;
 
         const timings_ns = self.readings.timings_ns;
-        const s = try Statistics(u64).init(allocator, timings_ns);
+        const s = try Statistics(u64).init(timings_ns);
         const truncated_name = self.name[0..@min(22, self.name.len)];
         // Benchmark name, number of iterations, and total time
         try writer.print("{s:<22} ", .{truncated_name});
-        try tty_config.setColor(writer, Color.cyan);
+        // TODO :
+        // try tty_config.setColor(writer, Color.cyan);
         try writer.print("{d:<8} {D:<15}", .{
             self.readings.iterations,
             s.total,
         });
         // Mean + standard deviation
-        try tty_config.setColor(writer, Color.green);
+        // // TODO :
+        // try tty_config.setColor(writer, Color.green);
         try writer.print("{s:<23}", .{
             try std.fmt.bufPrint(&buf, "{D:.3} ± {D:.3}", .{
                 s.mean,
@@ -51,7 +54,8 @@ pub const Result = struct {
             }),
         });
         // Minimum and maximum
-        try tty_config.setColor(writer, Color.blue);
+        // // TODO :
+        // try tty_config.setColor(writer, Color.blue);
         try writer.print("{s:<29}", .{
             try std.fmt.bufPrint(&buf, "({D:.3} ... {D:.3})", .{
                 s.min,
@@ -59,25 +63,28 @@ pub const Result = struct {
             }),
         });
         // Percentiles
-        try tty_config.setColor(writer, Color.cyan);
+        // // TODO :
+        // try tty_config.setColor(writer, Color.cyan);
         try writer.print("{D:<10} {D:<10} {D:<10}", .{
             s.percentiles.p75,
             s.percentiles.p99,
             s.percentiles.p995,
         });
         // End of line
-        try tty_config.setColor(writer, Color.reset);
+        // // TODO :
+        // try tty_config.setColor(writer, Color.reset);
         try writer.writeAll("\n");
 
         if (self.readings.allocations) |allocs| {
-            const m = try Statistics(usize).init(allocator, allocs.maxes);
+            const m = try Statistics(usize).init(allocs.maxes);
             // Benchmark name
             const name = try std.fmt.bufPrint(&buf, "{s} [MEMORY]", .{
                 truncated_name,
             });
             try writer.print("{s:<46} ", .{name});
             // Mean + standard deviation
-            try tty_config.setColor(writer, Color.green);
+            // TODO :
+            // try tty_config.setColor(writer, Color.green);
             try writer.print("{s:<23}", .{
                 try std.fmt.bufPrint(&buf, "{Bi:.3} ± {Bi:.3}", .{
                     m.mean,
@@ -85,7 +92,8 @@ pub const Result = struct {
                 }),
             });
             // Minimum and maximum
-            try tty_config.setColor(writer, Color.blue);
+            // TODO :
+            // try tty_config.setColor(writer, Color.blue);
             try writer.print("{s:<29}", .{
                 try std.fmt.bufPrint(&buf, "({Bi:.3} ... {Bi:.3})", .{
                     m.min,
@@ -93,28 +101,29 @@ pub const Result = struct {
                 }),
             });
             // Percentiles
-            try tty_config.setColor(writer, Color.cyan);
+            // TODO :
+            // try tty_config.setColor(writer, Color.cyan);
             try writer.print("{Bi:<10.3} {Bi:<10.3} {Bi:<10.3}", .{
                 m.percentiles.p75,
                 m.percentiles.p99,
                 m.percentiles.p995,
             });
             // End of line
-            try tty_config.setColor(writer, Color.reset);
+            // TODO :
+            // try tty_config.setColor(writer, Color.reset);
             try writer.writeAll("\n");
         }
     }
 
     pub fn writeJSON(
         self: Result,
-        allocator: std.mem.Allocator,
         writer: *std.Io.Writer,
     ) !void {
         const timings_ns_stats =
-            try Statistics(u64).init(allocator, self.readings.timings_ns);
+            try Statistics(u64).init(self.readings.timings_ns);
         if (self.readings.allocations) |allocs| {
             const allocation_maxes_stats =
-                try Statistics(usize).init(allocator, allocs.maxes);
+                try Statistics(usize).init(allocs.maxes);
             try writer.print(
                 \\{{ "name": "{f}",
                 \\   "timing_statistics": {f}, "timings": {f},

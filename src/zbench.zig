@@ -22,7 +22,6 @@ const ShufflingAllocator = @import("allocators/shuffling_allocator.zig").Shuffli
 const Partial = @import("partial.zig").Partial;
 const partial = @import("partial.zig").partial;
 const platform = @import("platform/platform.zig");
-const Color = std.Io.Terminal.Color;
 
 /// Benchmark manager, add your benchmark functions and run measure them.
 pub const Benchmark = struct {
@@ -184,8 +183,9 @@ pub const Benchmark = struct {
 
         try prettyPrintHeader(writer);
 
+        // TODO :
         // Detect TTY configuration for color output
-        const tty_config = std.Io.tty.Config.detect(std.fs.File.stdout());
+        // const tty_config = std.Io.tty.Config.detect(std.fs.File.stdout());
 
         var iter = try self.iterator();
         while (try iter.next()) |step| switch (step) {
@@ -193,7 +193,9 @@ pub const Benchmark = struct {
             .result => |x| {
                 defer x.deinit();
 
-                try x.prettyPrint(arena.allocator(), writer, tty_config);
+                // TODO :
+                // try x.prettyPrint(arena.allocator(), writer, tty_config);
+                try x.prettyPrint(writer);
                 _ = arena.reset(.retain_capacity);
             },
         };
