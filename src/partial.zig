@@ -6,15 +6,30 @@ pub fn Partial(comptime T: type) type {
         .@"struct" => |x| x,
         else => @compileError("Partial only supports struct types for now"),
     };
-    var fields: [T_info.fields.len]std.builtin.Type.StructField = undefined;
-    for (T_info.fields, &fields) |fi, *fo| {
-        fo.* = fi;
-        fo.*.type = ?fi.type;
-        fo.*.default_value_ptr = &@as(?fi.type, null);
+
+    const fields = T_info.fields;
+
+    comptime var field_names: [fields.len][]const u8 = undefined;
+    comptime var field_types: [fields.len]type = undefined;
+    comptime var field_attrs: [fields.len]std.builtin.Type.StructField.Attributes = undefined;
+
+    inline for (fields, 0..) |field, i| {
+        field_names[i] = field.name;
+        field_types[i] = ?field.type;
+        field_attrs[i] = .{
+            .@"comptime" = field.is_comptime,
+            .@"align" = field.alignment,
+            .default_value_ptr = &@as(?field.type, null),
+        };
     }
-    var result = T_info;
-    result.fields = &fields;
-    return @Type(.{ .@"struct" = result });
+
+    return @Struct(
+        T_info.layout,
+        T_info.backing_integer,
+        &field_names,
+        &field_types,
+        &field_attrs,
+    );
 }
 
 /// Take any non-null fields from x, and any null fields are taken from y

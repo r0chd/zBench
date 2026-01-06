@@ -1,12 +1,18 @@
 const std = @import("std");
 const zbench = @import("zbench");
+const log = std.log.scoped(.zbench_example_sleep);
+
+var threaded: std.Io.Threaded = .init_single_threaded;
+const io = threaded.io();
 
 fn sleepBenchmark(_: std.mem.Allocator) void {
-    std.Thread.sleep(100_000_000);
+    io.sleep(.fromMilliseconds(100), .awake) catch |err| {
+        log.err("sleep failed: {}", .{err});
+    };
 }
 
 pub fn main() !void {
-    var stdout = std.fs.File.stdout().writerStreaming(&.{});
+    var stdout: std.Io.File.Writer = std.Io.File.stdout().writerStreaming(io, &.{});
     const writer = &stdout.interface;
 
     var bench = zbench.Benchmark.init(std.heap.page_allocator, .{});

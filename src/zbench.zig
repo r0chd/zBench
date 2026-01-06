@@ -22,7 +22,7 @@ const ShufflingAllocator = @import("allocators/shuffling_allocator.zig").Shuffli
 const Partial = @import("partial.zig").Partial;
 const partial = @import("partial.zig").partial;
 const platform = @import("platform/platform.zig");
-const Color = std.Io.tty.Color;
+const Color = std.Io.Terminal.Color;
 
 /// Benchmark manager, add your benchmark functions and run measure them.
 pub const Benchmark = struct {
@@ -72,8 +72,8 @@ pub const Benchmark = struct {
             ),
         };
 
-        // Check the benchmark parameter has a well typed run function.
-        _ = @as(fn (T, std.mem.Allocator) void, T.run);
+        // Check the benchmark parameter has a well-typed run function.
+        _ = @as(fn (*T, std.mem.Allocator) void, T.run);
 
         try self.benchmarks.append(self.allocator, Definition{
             .name = name,

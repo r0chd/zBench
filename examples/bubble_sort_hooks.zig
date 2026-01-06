@@ -48,31 +48,6 @@ fn afterAll() void {
     benchmark_data.deinit();
 }
 
-pub fn main() !void {
-    var stdout = std.fs.File.stdout().writerStreaming(&.{});
-    const writer = &stdout.interface;
-
-    var bench = zbench.Benchmark.init(gpa.allocator(), .{});
-    defer {
-        bench.deinit();
-        const deinit_status = gpa.deinit();
-        if (deinit_status == .leak) std.debug.panic("Memory leak detected", .{});
-    }
-
-    try bench.add("Bubble Sort Benchmark", myBenchmark, .{
-        .track_allocations = true, // Option used to show that hooks are not included in the tracking.
-        .hooks = .{ // Fields are optional and can be omitted.
-            .before_all = beforeAll,
-            .after_all = afterAll,
-            .before_each = beforeEach,
-            .after_each = afterEach,
-        },
-    });
-
-    try writer.writeAll("\n");
-    try bench.run(writer);
-}
-
 const BenchmarkData = struct {
     rand: std.Random,
     numbers: std.array_list.Managed(i32),
@@ -102,3 +77,31 @@ const BenchmarkData = struct {
         self.numbers.clearRetainingCapacity();
     }
 };
+
+pub fn main() !void {
+    var threaded: std.Io.Threaded = .init_single_threaded;
+    const io = threaded.io();
+
+    var stdout: std.Io.File.Writer = std.Io.File.stdout().writerStreaming(io, &.{});
+    const writer = &stdout.interface;
+
+    var bench = zbench.Benchmark.init(gpa.allocator(), .{});
+    defer {
+        bench.deinit();
+        const deinit_status = gpa.deinit();
+        if (deinit_status == .leak) std.debug.panic("Memory leak detected", .{});
+    }
+
+    try bench.add("Bubble Sort Benchmark", myBenchmark, .{
+        .track_allocations = true, // Option used to show that hooks are not included in the tracking.
+        .hooks = .{ // Fields are optional and can be omitted.
+            .before_all = beforeAll,
+            .after_all = afterAll,
+            .before_each = beforeEach,
+            .after_each = afterEach,
+        },
+    });
+
+    try writer.writeAll("\n");
+    try bench.run(writer);
+}
