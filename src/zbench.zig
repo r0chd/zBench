@@ -183,7 +183,7 @@ pub const Benchmark = struct {
 
         try prettyPrintHeader(writer);
 
-        // TODO :
+        // TODO : #137
         // Detect TTY configuration for color output
         // const tty_config = std.Io.tty.Config.detect(std.fs.File.stdout());
 
@@ -193,7 +193,7 @@ pub const Benchmark = struct {
             .result => |x| {
                 defer x.deinit();
 
-                // TODO :
+                // TODO : #137
                 // try x.prettyPrint(arena.allocator(), writer, tty_config);
                 try x.prettyPrint(writer);
                 _ = arena.reset(.retain_capacity);

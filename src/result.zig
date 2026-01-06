@@ -2,7 +2,7 @@ const std = @import("std");
 const Statistics = @import("statistics.zig").Statistics;
 const fmt = @import("fmt.zig");
 const statistics = @import("statistics.zig");
-// TODO :
+// TODO : #137
 // const Color = std.Io.Terminal.Color;
 const Runner = @import("runner.zig");
 const Readings = Runner.Readings;
@@ -28,7 +28,7 @@ pub const Result = struct {
     pub fn prettyPrint(
         self: Result,
         writer: *std.Io.Writer,
-        // TODO :
+        // TODO : #137
         // tty_config: std.Io.tty.Config,
     ) !void {
         var buf: [128]u8 = undefined;
@@ -45,7 +45,7 @@ pub const Result = struct {
             s.total,
         });
         // Mean + standard deviation
-        // // TODO :
+        // TODO : #137
         // try tty_config.setColor(writer, Color.green);
         try writer.print("{s:<23}", .{
             try std.fmt.bufPrint(&buf, "{D:.3} ± {D:.3}", .{
@@ -54,7 +54,7 @@ pub const Result = struct {
             }),
         });
         // Minimum and maximum
-        // // TODO :
+        // TODO :
         // try tty_config.setColor(writer, Color.blue);
         try writer.print("{s:<29}", .{
             try std.fmt.bufPrint(&buf, "({D:.3} ... {D:.3})", .{
@@ -63,7 +63,7 @@ pub const Result = struct {
             }),
         });
         // Percentiles
-        // // TODO :
+        // TODO : #137
         // try tty_config.setColor(writer, Color.cyan);
         try writer.print("{D:<10} {D:<10} {D:<10}", .{
             s.percentiles.p75,
@@ -71,7 +71,7 @@ pub const Result = struct {
             s.percentiles.p995,
         });
         // End of line
-        // // TODO :
+        // TODO : #137
         // try tty_config.setColor(writer, Color.reset);
         try writer.writeAll("\n");
 
@@ -83,7 +83,7 @@ pub const Result = struct {
             });
             try writer.print("{s:<46} ", .{name});
             // Mean + standard deviation
-            // TODO :
+            // TODO : #137
             // try tty_config.setColor(writer, Color.green);
             try writer.print("{s:<23}", .{
                 try std.fmt.bufPrint(&buf, "{Bi:.3} ± {Bi:.3}", .{
@@ -92,7 +92,7 @@ pub const Result = struct {
                 }),
             });
             // Minimum and maximum
-            // TODO :
+            // TODO : #137
             // try tty_config.setColor(writer, Color.blue);
             try writer.print("{s:<29}", .{
                 try std.fmt.bufPrint(&buf, "({Bi:.3} ... {Bi:.3})", .{
@@ -101,7 +101,7 @@ pub const Result = struct {
                 }),
             });
             // Percentiles
-            // TODO :
+            // TODO : #137
             // try tty_config.setColor(writer, Color.cyan);
             try writer.print("{Bi:<10.3} {Bi:<10.3} {Bi:<10.3}", .{
                 m.percentiles.p75,
@@ -109,7 +109,7 @@ pub const Result = struct {
                 m.percentiles.p995,
             });
             // End of line
-            // TODO :
+            // TODO : #137
             // try tty_config.setColor(writer, Color.reset);
             try writer.writeAll("\n");
         }

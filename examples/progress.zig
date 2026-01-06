@@ -35,7 +35,7 @@ pub fn main() !void {
     try writer.writeAll("\n");
     try zbench.prettyPrintHeader(writer);
 
-    // TODO :
+    // TODO : #137
     // Detect TTY configuration for color output
     // const tty_config = std.Io.tty.Config.detect(std.fs.File.stdout());
 
@@ -83,7 +83,7 @@ pub fn main() !void {
             completed_benchmarks += 1;
             suite_node.setCompletedItems(completed_benchmarks);
 
-            // TODO :
+            // TODO : #137
             // Print the result
             // try r.prettyPrint(allocator, writer, tty_config);
             try r.prettyPrint(writer);
