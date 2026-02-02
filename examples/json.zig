@@ -39,7 +39,7 @@ pub fn main() !void {
     var iter = try bench.iterator();
     var i: usize = 0;
     while (try iter.next()) |step| switch (step) {
-        .progress => |_| {},
+        .progress => {},
         .result => |x| {
             defer x.deinit();
             defer i += 1;

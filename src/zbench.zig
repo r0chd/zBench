@@ -189,7 +189,7 @@ pub const Benchmark = struct {
 
         var iter = try self.iterator();
         while (try iter.next()) |step| switch (step) {
-            .progress => |_| {},
+            .progress => {},
             .result => |x| {
                 defer x.deinit();
 
